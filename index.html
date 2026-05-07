@@ -307,7 +307,7 @@ async function loadEvents(){
 }
 
 async function loadPinned(){
-  const {data}=await db.from('notas').select('*').eq('dono','s');
+  const {data}=await db.from('notas').select('*').eq('dono','pinned');
   if(data&&data[0]){try{const p=JSON.parse(data[0].conteudo||'[]');if(Array.isArray(p))S.pinned=p;}catch(e){S.pinned=[];}}
   renderPinned();
 }
@@ -442,7 +442,7 @@ async function removePin(e,idx){
 }
 
 async function savePinned(){
-  await db.from('notas').update({conteudo:JSON.stringify(S.pinned),atualizado_em:new Date().toISOString()}).eq('dono','s');
+  await db.from('notas').update({conteudo:JSON.stringify(S.pinned),atualizado_em:new Date().toISOString()}).eq('dono','pinned');
 }
 
 async function saveNote(){

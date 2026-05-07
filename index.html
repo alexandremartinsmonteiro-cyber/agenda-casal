@@ -98,11 +98,11 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);display:flex;flex-dir
 .pinned-list{display:flex;flex-direction:column;gap:5px;max-height:170px;overflow-y:auto}
 .pinned-card{border-radius:5px;padding:7px 10px;font-size:12px;line-height:1.4;cursor:pointer;border-left:3px solid;display:flex;align-items:flex-start;justify-content:space-between;gap:6px}
 .pinned-card:hover{opacity:.85}
-.pinned-card.c0{background:var(--alex-bg);color:var(--alex-txt);border-color:var(--alex-bd)}
-.pinned-card.c1{background:var(--shar-bg);color:var(--shar-txt);border-color:var(--shar-bd)}
-.pinned-card.c2{background:var(--espo-bg);color:var(--espo-txt);border-color:var(--espo-bd)}
-.pinned-card.c3{background:#EEE8F8;color:#3A2070;border-color:#9A78D0}
-.pinned-card.c4{background:#F5EAE0;color:#5A2A10;border-color:#C07040}
+.pinned-card.c0{background:#4A8A1A;color:#F0FAE8;border-color:#2A5A08;font-weight:500}
+.pinned-card.c1{background:#B8841A;color:#FFF8E8;border-color:#7A5208;font-weight:500}
+.pinned-card.c2{background:#1A8A6A;color:#E8FAF5;border-color:#0A5040;font-weight:500}
+.pinned-card.c3{background:#6A3AAA;color:#F5EEFF;border-color:#3A1870;font-weight:500}
+.pinned-card.c4{background:#B84A28;color:#FFF0EC;border-color:#7A2A10;font-weight:500}
 .pinned-txt{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:400}
 .pinned-x{font-size:15px;opacity:.45;flex-shrink:0;line-height:1;cursor:pointer;padding:0 2px}
 .pinned-x:hover{opacity:.9}
@@ -265,7 +265,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);display:flex;flex-dir
 <script>
 const SUPA_URL='https://zisgtsrqtcddednwympb.supabase.co';
 const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inppc2d0c3JxdGNkZGVkbnd5bXBiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgxMDQ0NzMsImV4cCI6MjA5MzY4MDQ3M30.UqcOVGzqsrlp8xnYqXncOseOICQSX6aDi0rftQubVmw';
-const PIN='1210'; // ← MUDE ESTE PIN
+const PIN='1234'; // ← MUDE ESTE PIN
 const {createClient}=supabase;
 const db=createClient(SUPA_URL,SUPA_KEY);
 

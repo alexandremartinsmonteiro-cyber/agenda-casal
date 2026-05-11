@@ -88,10 +88,34 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);display:flex;flex-dir
 .mc-d.om{color:var(--txt3)}
 .mc-dn{font-size:13px;width:22px;height:22px;display:flex;align-items:center;justify-content:center}
 .mc-dots{display:flex;gap:2px;justify-content:center}
-.mc-dot{width:4px;height:4px;border-radius:50%}
+.mc-dot{width:6px;height:6px;border-radius:2px}
 .mc-dot.a{background:var(--alex-bd)}
 .mc-dot.e{background:var(--espo-bd)}
 .mc-dot.s{background:var(--shar-bd)}
+.mc-dot.overdue{background:#A32D2D;border-radius:50%;width:7px;height:7px}
+.mc-d.has-ev{border-radius:6px}
+.mc-d.has-ev-a{background:rgba(90,158,34,.13)}
+.mc-d.has-ev-e{background:rgba(42,154,114,.13)}
+.mc-d.has-ev-s{background:rgba(184,132,26,.13)}
+.mc-d.today-d.has-ev-a,.mc-d.today-d.has-ev-e,.mc-d.today-d.has-ev-s{background:var(--today-bg)}
+
+/* Evento — layout interno com bolinha de status */
+.wc-ev,.dev{display:flex;align-items:center;gap:6px;position:relative}
+.ev-status{width:14px;height:14px;border-radius:50%;border:2px solid currentColor;flex-shrink:0;display:flex;align-items:center;justify-content:center;opacity:.55;transition:all .15s;cursor:pointer}
+.ev-status:hover{opacity:1;transform:scale(1.15)}
+.ev-status svg{display:none;width:8px;height:8px}
+.ev-body{flex:1;min-width:0}
+
+/* Concluído */
+.wc-ev.done,.dev.done{background:#1E6B3A!important;border-color:#145228!important;color:#E8FAF0!important}
+.wc-ev.done .ev-status,.dev.done .ev-status{background:#2ABF6A;border-color:#145228;opacity:1}
+.wc-ev.done .ev-status svg,.dev.done .ev-status svg{display:block;stroke:#fff;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round}
+.wc-ev.done .ev-body,.dev.done .ev-body{text-decoration:line-through;opacity:.75}
+
+/* Vencido */
+@keyframes blink-red{0%,100%{opacity:1}50%{opacity:.4}}
+.wc-ev.overdue,.dev.overdue{border-color:#A32D2D!important;background:#FDEAEA!important;color:#7A1010!important;animation:blink-red 1.5s ease-in-out infinite}
+.wc-ev.overdue .ev-status,.dev.overdue .ev-status{border-color:#A32D2D;color:#A32D2D}
 
 .pinned-section{border-top:1px solid var(--border);padding:8px 12px;display:flex;flex-direction:column;gap:6px;flex-shrink:0}
 .pinned-label{font-size:10px;font-weight:500;color:var(--txt3);text-transform:uppercase;letter-spacing:.7px}
@@ -315,6 +339,15 @@ async function loadPinned(){
 function render(){renderLabel();renderWeek();renderMonth();renderDay()}
 function renderLabel(){document.getElementById('nav-label').textContent=MONTHS[S.cur.getMonth()]+' '+S.cur.getFullYear()}
 
+function evHtml(e,ds,cls='wc-ev'){
+  const od=isOverdue(e,ds);
+  const dc=e.concluido?'done':(od?'overdue':'');
+  const check=`<svg viewBox="0 0 10 8"><polyline points="1,4 4,7 9,1"/></svg>`;
+  const statusBtn=`<span class="ev-status" onclick="toggleDone(event,'${e.id}')" title="${e.concluido?'Reabrir':'Marcar concluído'}">${check}</span>`;
+  const time=e.hora?`<span class="ev-time">${e.hora.slice(0,5)}</span>`:'';
+  return`<div class="${cls} ${e.dono} ${dc}" onclick="editEv('${e.id}')">${statusBtn}<span class="ev-body">${time}${e.titulo}</span></div>`;
+}
+
 function renderWeek(){
   const sel=S.sel,dow=sel.getDay(),ws=new Date(sel);ws.setDate(sel.getDate()-dow);
   const evs=visEvs();let html='';
@@ -322,7 +355,7 @@ function renderWeek(){
     const dd=new Date(ws);dd.setDate(ws.getDate()+d);const ds=d2s(dd);
     const isT=ds===todayStr();
     const de=evs.filter(e=>e.data===ds).sort((a,b)=>(a.hora||'99:99').localeCompare(b.hora||'99:99'));
-    const eh=de.map(e=>`<div class="wc-ev ${e.dono}" onclick="editEv('${e.id}')">${e.hora?`<span class="ev-time">${e.hora.slice(0,5)}</span>`:''}${e.titulo}</div>`).join('');
+    const eh=de.map(e=>evHtml(e,ds,'wc-ev')).join('');
     html+=`<div class="week-col${isT?' today-col':''}"><div class="wc-head"><div class="wc-name">${WDS[d]}</div><div class="wc-num" onclick="selectDay('${ds}')">${dd.getDate()}</div></div><div class="wc-body" onclick="selectDay('${ds}')">${eh}</div><button class="wc-add" onclick="openModalDate('${ds}')">+</button></div>`;
   }
   document.getElementById('week-grid').innerHTML=html;
@@ -341,7 +374,11 @@ function renderMonth(){
     else{num=i-fd+1;ds=`${c.getFullYear()}-${String(c.getMonth()+1).padStart(2,'0')}-${String(num).padStart(2,'0')}`;}
     if(ds===todayStr())cls+=' today-d';if(ds===selStr())cls+=' sel-d';
     const de=evs.filter(e=>e.data===ds);const owners=[...new Set(de.map(e=>e.dono))];
-    const dots=owners.slice(0,3).map(o=>`<div class="mc-dot ${o}"></div>`).join('');
+    if(de.length){const dom=owners[0];cls+=' has-ev has-ev-'+dom;}
+    const hasOverdue=ds<todayStr()&&de.some(e=>!e.concluido);
+    const dots=hasOverdue
+      ? `<div class="mc-dot overdue"></div>`
+      : owners.slice(0,3).map(o=>`<div class="mc-dot ${o}"></div>`).join('');
     html+=`<div class="${cls}" onclick="selectDay('${ds}')"><div class="mc-dn">${num}</div><div class="mc-dots">${dots}</div></div>`;
   }
   document.getElementById('mc-days').innerHTML=html;
@@ -353,11 +390,11 @@ function renderDay(){
   const evs=visEvs().filter(e=>e.data===ds).sort((a,b)=>(a.hora||'99:99').localeCompare(b.hora||'99:99'));
   const noTime=evs.filter(e=>!e.hora),wt=evs.filter(e=>e.hora);
   let html='';
-  if(noTime.length)html+=`<div class="dslot"><div class="dtime">—</div><div class="devs">${noTime.map(e=>`<div class="dev ${e.dono}" onclick="editEv('${e.id}')">${e.titulo}</div>`).join('')}</div></div>`;
+  if(noTime.length)html+=`<div class="dslot"><div class="dtime">—</div><div class="devs">${noTime.map(e=>evHtml(e,ds,'dev')).join('')}</div></div>`;
   [7,8,9,10,11,12,13,14,15,16,17,18,19,20,21].forEach(h=>{
     const hs=String(h).padStart(2,'0');
     const sl=wt.filter(e=>e.hora&&e.hora.startsWith(hs+':'));
-    html+=`<div class="dslot"><div class="dtime">${hs}h</div><div class="devs">${sl.map(e=>`<div class="dev ${e.dono}" onclick="editEv('${e.id}')">${e.titulo}</div>`).join('')}</div></div>`;
+    html+=`<div class="dslot"><div class="dtime">${hs}h</div><div class="devs">${sl.map(e=>evHtml(e,ds,'dev')).join('')}</div></div>`;
   });
   if(!evs.length)html='<div class="empty-d">Nenhum evento</div>';
   document.getElementById('day-slots').innerHTML=html;
@@ -452,6 +489,21 @@ async function saveNote(){
   if(!error){btn.textContent='salvo ✓';setStatus('nota salva às '+new Date().toLocaleTimeString('pt-BR'));}
   else{btn.textContent='erro!';}
   setTimeout(()=>btn.textContent='salvar',1500);
+}
+
+function isOverdue(ev,ds){
+  if(ev.concluido)return false;
+  return ds<todayStr();
+}
+
+async function toggleDone(e,id){
+  e.stopPropagation();
+  const ev=S.events.find(x=>x.id===id);if(!ev)return;
+  const novo=!ev.concluido;
+  ev.concluido=novo; // optimistic update
+  render();
+  await db.from('eventos').update({concluido:novo,atualizado_em:new Date().toISOString()}).eq('id',id);
+  setStatus((novo?'Concluído':'Reaberto')+': '+ev.titulo+' às '+new Date().toLocaleTimeString('pt-BR'));
 }
 
 window.onload=()=>pinInputs[0].focus();

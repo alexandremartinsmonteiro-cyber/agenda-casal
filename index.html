@@ -77,7 +77,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);display:flex;flex-dir
 .ph button:hover{background:rgba(238,245,232,.15)}
 
 .cal-inner{flex:1;display:flex;flex-direction:column;overflow:hidden;min-height:0}
-.mcal{padding:12px 14px;flex-shrink:0;max-height:260px;overflow:hidden}
+.mcal{padding:12px 14px;flex-shrink:1;min-height:0;overflow:hidden}
 .mc-wdays{display:grid;grid-template-columns:repeat(7,1fr);margin-bottom:5px}
 .mc-wdays span{text-align:center;font-size:12px;color:var(--txt3);font-weight:500}
 .mc-days{display:grid;grid-template-columns:repeat(7,1fr);gap:2px}
@@ -117,7 +117,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);display:flex;flex-dir
 .wc-ev.overdue,.dev.overdue{border-color:#A32D2D!important;background:#FDEAEA!important;color:#7A1010!important;animation:blink-red 1.5s ease-in-out infinite}
 .wc-ev.overdue .ev-status,.dev.overdue .ev-status{border-color:#A32D2D;color:#A32D2D}
 
-.pinned-section{border-top:1px solid var(--border);padding:8px 12px;display:flex;flex-direction:column;gap:6px;flex-shrink:0;min-height:80px}
+.pinned-section{border-top:1px solid var(--border);padding:8px 12px;display:flex;flex-direction:column;gap:6px;flex-shrink:0;min-height:60px;max-height:200px;overflow-y:auto}
 .pinned-label{font-size:10px;font-weight:500;color:var(--txt3);text-transform:uppercase;letter-spacing:.7px}
 .pinned-list{display:flex;flex-direction:column;gap:5px;max-height:120px;overflow-y:auto}
 .pinned-card{border-radius:5px;padding:7px 10px;font-size:12px;line-height:1.4;cursor:pointer;border-left:3px solid;display:flex;align-items:flex-start;justify-content:space-between;gap:6px}
